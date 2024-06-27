@@ -13,7 +13,7 @@ logger.add('./logs/log.log', rotation='1 day', retention='30 days')
 app = Flask(__name__)
 
 
-def get_taxi(card_name):
+def get_provider(card_name):
     """ Функция для получения такси """
     connection = pymysql.connect(
         host=os.getenv('DB_HOST'), 
@@ -40,28 +40,28 @@ def get_taxi(card_name):
         connection.close()
 
 
-def get_tg_settings(taxi):
+def get_tg_settings(provider):
     """ Функция для получения настроек Telegram """
-    if taxi == 'Fly':
-        return os.getenv('TG_TOKEN_FLY'), os.getenv('TG_CHAT_ID_FLY')
-    elif taxi == 'Jet':
-        return os.getenv('TG_TOKEN_JET'), os.getenv('TG_CHAT_ID_JET')
-    else:
+    try:
+        return os.getenv(f'TG_TOKEN_{provider}'), os.getenv(f'TG_CHAT_ID_{provider}')
+    except Exception as EX:
+        logger.exception(EX)
         return None
 
 
 def make_message(card_name, send_number, text):
+
     """ Функция для создания сообщения """
     return f'Получатель: {card_name}\nОтправитель: {send_number}\nСообщение: {text}'
 
 
 def send_message(card_name, message):
     """ Функция для отправки сообщения """
-    taxi = get_taxi(card_name)
-    if not taxi:
+    provider = get_provider(card_name)
+    if not provider:
         logger.error("Не удалось определить такси")
         return
-    tg_data = get_tg_settings(taxi)
+    tg_data = get_tg_settings(provider)
     if not tg_data:
         logger.error("Не удалось получить данные для Telegram")
         return
@@ -100,13 +100,13 @@ def handle_post():
 
 
 def test():
-    card_name = 'LIFE_1'
-    number = '0632079737'
+    card_name = 'Trunk1'
+    number = '3800000000'
     text = 'Тест\n123\n456'
     message = make_message(card_name, number, text)
     send_message(card_name, message)
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5001)
+    app.run(debug=True, host='0.0.0.0', port=5000)
     # test()
