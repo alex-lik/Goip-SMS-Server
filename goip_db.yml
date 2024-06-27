@@ -1,0 +1,28 @@
+version: "2"
+
+services:
+  goismsdb:
+    image: mariadb
+    volumes:
+      - ./goip_db/:/var/lib/mysql
+#      - ./my.cnf:/etc/mysql/my.cnf
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+    ports:
+      - 3307:3306
+    restart: "always"
+
+
+  goipsmsadminer:
+    image: adminer
+    ports:
+      - 8085:8080
+    depends_on:
+      - goismsdb
+
+    links:
+      - goismsdb:db
+
+    restart: "always"
