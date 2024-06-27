@@ -10,11 +10,11 @@ services:
       - 44444:44444/udp
       - 8086:80
     environment:
-      - MYTIMEZONE=${MYTIMEZONE}
-      - GOIP_WEB_LOGIN=${GOIP_WEB_LOGIN}
-      - GOIP_WEB_PASSWORD=${GOIP_WEB_PASSWORD}
-      - MYSQL_MAIN_HOST=${DB_HOST}
-      - MYSQL_MAIN_PORT=${DB_PORT}
-      - MYSQL_MAIN_DB=${DB_NAME}
-      - MYSQL_MAIN_LOGIN=${DB_USER}
-      - MYSQL_MAIN_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYTIMEZONE=Europe/Kiev
+      - GOIP_WEB_LOGIN=smsadmin
+      - GOIP_WEB_PASSWORD=mysuperCoOlpassXX1
+      - MYSQL_MAIN_HOST=10.0.15.4
+      - MYSQL_MAIN_PORT=3307
+      - MYSQL_MAIN_DB=goip
+      - MYSQL_MAIN_LOGIN=root
+      - MYSQL_MAIN_PASSWORD=123456
