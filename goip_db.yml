@@ -9,9 +9,9 @@ services:
       - "/etc/timezone:/etc/timezone:ro"
       - "/etc/localtime:/etc/localtime:ro"
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_PASSWORD: 123456
     ports:
-      - "${DB_PORT}:3306"
+      - "3307:3306"
     restart: "always"
 
   goipsmsadminer:
