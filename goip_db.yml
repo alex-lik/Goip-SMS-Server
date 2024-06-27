@@ -9,11 +9,10 @@ services:
       - "/etc/timezone:/etc/timezone:ro"
       - "/etc/localtime:/etc/localtime:ro"
     environment:
-      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
-      - 3307:3306
+      - "${DB_PORT}:3306"
     restart: "always"
-
 
   goipsmsadminer:
     image: adminer
@@ -21,8 +20,6 @@ services:
       - 8085:8080
     depends_on:
       - goismsdb
-
     links:
       - goismsdb:db
-
     restart: "always"
