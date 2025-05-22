@@ -1,6 +1,18 @@
 #!/bin/bash
 
-# Остановка всех контейнеров
-docker-compose -f goip_db.yml down
-docker-compose -f goip_sms.yml down
-docker-compose -f app_notificator/docker-compose.yml down
+set -euo pipefail
+IFS=$'\n\t'
+
+set -a
+source .env
+set +a
+
+stop_service() {
+  local file="$1"
+  echo "[INFO] Остановка контейнеров: $file"
+  docker-compose -f "$file" down
+}
+
+stop_service "$GOIP_DB_COMPOSE"
+stop_service "$GOIP_SMS_COMPOSE"
+stop_service "$APP_NOTIFICATOR_COMPOSE"
