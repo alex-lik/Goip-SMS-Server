@@ -1,5 +1,5 @@
-Flask
-loguru
-pymysql
-requests
-python-dotenv
+Flask==2.3.3
+loguru==0.7.2
+pymysql==1.1.0
+requests==2.31.0
+python-dotenv==1.0.1
