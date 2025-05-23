@@ -1,0 +1,63 @@
+version: "3.9"
+
+networks:
+  goip_net:
+
+services:
+  db:
+    image: mariadb:10.5
+    container_name: goip_mariadb
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: ${TZ}
+    ports:
+      - "${MYSQL_PORT}:3306"
+    volumes:
+      - ./goip_db:/var/lib/mysql
+      - ./init:/docker-entrypoint-initdb.d
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - goip_net
+    profiles: ["db"]
+
+  adminer:
+    image: adminer
+    container_name: goip_adminer
+    restart: unless-stopped
+    ports:
+      - "${ADMINER_PORT}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - goip_net
+    profiles: ["adminer"]
+
+  sms:
+    image: bzmn/goip-sms-server
+    container_name: goip_sms_server
+    restart: always
+    network_mode: bridge
+    ports:
+      - "${GOIP_SMS_UDP_PORT}:44444/udp"
+      - "${GOIP_SMS_HTTP_PORT}:80"
+    environment:
+      MYTIMEZONE: ${MYTIMEZONE}
+      GOIP_WEB_LOGIN: ${GOIP_WEB_LOGIN}
+      GOIP_WEB_PASSWORD: ${GOIP_WEB_PASSWORD}
+      MYSQL_MAIN_HOST: ${MYSQL_MAIN_HOST}
+      MYSQL_MAIN_PORT: ${MYSQL_MAIN_PORT}
+      MYSQL_MAIN_DB: ${MYSQL_MAIN_DB}
+      MYSQL_MAIN_LOGIN: ${MYSQL_MAIN_LOGIN}
+      MYSQL_MAIN_PASSWORD: ${MYSQL_MAIN_PASSWORD}
+    profiles: ["sms"]
