@@ -12,4 +12,4 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 COPY . .
 
-CMD ["python", "main.py"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "main:app"]

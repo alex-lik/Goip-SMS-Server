@@ -1,5 +1,6 @@
 Flask==2.3.3
+gunicorn==23.0.0
 loguru==0.7.2
 pymysql==1.1.0
-requests==2.31.0
 python-dotenv==1.0.1
+requests==2.31.0
