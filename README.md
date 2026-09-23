@@ -1,78 +1,80 @@
 # Goip SMS Server
 
-Инфраструктура для приёма и рассылки SMS через шлюзы [GOIP](http://www.voip-info.org/goip): SMS-сервер с web-UI, MariaDB и Flask-сервис, который пересылает входящие сообщения в Telegram.
+[English](README.md) | [Русский](README.ru.md) | [Українська](README.uk.md) | [Deutsch](README.de.md)
 
-## Стек
+Infrastructure for sending and receiving SMS through [GOIP](http://www.voip-info.org/goip) gateways: an SMS server with a web UI, MariaDB and a Flask service that forwards incoming messages to Telegram.
 
-- **Python 3.9 + Flask** — сервис уведомлений (notificator)
-- **Loguru** — логирование с ротацией
-- **PyMySQL** — доступ к схеме GOIP SMS Server
-- **Telegram Bot API** — доставка уведомлений
-- **MariaDB 10.5 + Adminer** — хранение данных шлюзов
-- **Docker Compose** — оркестрация всех сервисов
+## Stack
 
-## Структура проекта
+- **Python 3.9 + Flask** — notification service (notificator)
+- **Loguru** — logging with rotation
+- **PyMySQL** — access to the GOIP SMS Server schema
+- **Telegram Bot API** — message delivery
+- **MariaDB 10.5 + Adminer** — gateway data storage
+- **Docker Compose** — orchestration of all services
+
+## Project structure
 
 ```
 .
-├── docker-compose.yml        # db, sms-сервер, notificator, adminer
-├── goip.sql                  # схема БД (инициализируется при первом старте db)
-├── app_notificator/          # Flask-приложение: пересылка SMS в Telegram
+├── docker-compose.yml        # db, sms server, notificator, adminer
+├── goip.sql                  # database schema (applied on first start of db)
+├── app_notificator/          # Flask app: forwards SMS to Telegram
 │   ├── Dockerfile
 │   ├── main.py
 │   └── requirements.txt
-├── Makefile                  # команды запуска
-└── .env.example              # пример настроек окружения
+├── Makefile                  # run commands
+└── .env.example              # environment configuration template
 ```
 
-## Запуск
+## Running
 
 ```bash
 cp .env.example .env
-cp app_notificator/.env.example app_notificator/.env   # токены Telegram
+cp app_notificator/.env.example app_notificator/.env   # Telegram tokens
 make up
 ```
 
-При первом запуске MariaDB создаёт базу и применяет схему из `goip.sql`.
+On the first start MariaDB creates the database and applies the schema from `goip.sql`.
 
-Полезные команды:
+Useful commands:
 
 ```bash
-make ps        # состояние контейнеров
-make logs      # логи всех сервисов
-make restart   # перезапуск
-make down      # остановка
+make ps        # container status
+make logs      # logs of all services
+make restart   # restart
+make down      # stop
 ```
 
-Adminer (профиль `adminer`) доступен на порту из `.env` (`ADMINER_PORT`).
+Adminer (the `adminer` profile) is available on the port from `.env` (`ADMINER_PORT`).
 
-## API notificator
+## Notificator API
 
-| Метод | Путь | Описание |
+| Method | Path | Description |
 | --- | --- | --- |
-| `GET` | `/` | проверка доступности сервиса |
-| `POST` | `/` | получение SMS от шлюза, пересылка в Telegram |
+| `GET` | `/` | service health check |
+| `POST` | `/` | receive SMS from the gateway and forward it to Telegram |
 
-Тело `POST`-запроса (форма или JSON):
+`POST` body (form or JSON):
 
-| Поле | Описание |
+| Field | Description |
 | --- | --- |
-| `name` | имя карты/шлюза (`goip.name`) |
-| `number` | номер отправителя |
-| `content` | текст сообщения |
+| `name` | card/gateway name (`goip.name`) |
+| `number` | sender number |
+| `content` | message text |
 
-Пример:
+Example:
 
 ```bash
 curl -X POST http://localhost:5001/ \
   -d 'name=Trunk1&number=38000&content=Test'
 ```
 
-По полю `name` сервис определяет провайдера карточки в БД и отправляет сообщение в чат, заданный переменными `TG_TOKEN_<PROV>` / `TG_CHAT_ID_<PROV>` из `app_notificator/.env`.
+Using the `name` field, the service resolves the card's provider in the database and sends the message to the chat defined by `TG_TOKEN_<PROV>` / `TG_CHAT_ID_<PROV>` in `app_notificator/.env`.
 
-## Конфигурация
+## Configuration
 
-Все настройки задаются в двух файлах окружения (в git попадают только примеры):
+All settings are defined in two environment files (only templates are committed to git):
 
-- `.env` — доступы к БД, порты, учётные данные web-UI SMS-сервера;
-- `app_notificator/.env` — токены Telegram и, при локальном запуске, параметры подключения к БД.
+- `.env` — database credentials, ports, SMS server web UI login;
+- `app_notificator/.env` — Telegram tokens and, for a local run, database connection settings.
