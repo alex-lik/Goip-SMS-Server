@@ -1,11 +1,11 @@
 up:
-	docker compose --profile db --profile adminer --profile sms up -d
+	docker compose --profile adminer up -d --build
 
 down:
-	docker compose down
+	docker compose --profile adminer down
 
 restart:
-	docker compose down && docker compose --profile db --profile adminer --profile sms up -d
+	docker compose --profile adminer down && docker compose --profile adminer up -d --build
 
 logs:
 	docker compose logs -f
